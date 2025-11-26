@@ -13,15 +13,99 @@ class GameConfig:
     # 设置各个回报项的权重，在reward_manager中使用
     REWARD_WEIGHT_DICT = {
         "hp_point": 2.0,
-        "tower_hp_point": 5.0,
-        "money": 0.006,
-        "exp": 0.006,
-        "ep_rate": 0.75,
-        "death": -1.0,
-        "kill": -0.6,
-        "last_hit": 0.5,
-        "forward": 0.01,
+        "tower_hp_point": 9.0,
+        "money": 0.012,
+        "exp": 0.009,
+        "ep_rate": 0.06,
+        "death": -2.5,
+        "kill": 0.8,
+        "last_hit": 1.3,
+        "forward": 0.009,
+        # Extra shaping rewards (only used on agent side, not zero-sum)
+        "minion_clear": 1.6,
+        "attack_tower": 3.5,
+        "health_management": 1.3,
     }
+    # Phase-aware weight multipliers. Final weight = REWARD_WEIGHT_DICT[key] * phase_multiplier
+    # 分阶段奖励权重系数：最终权重 = 基础权重 * 对应阶段乘数
+    PHASE_WEIGHT_MULTIPLIERS = {
+        "early": {
+            "money": 1.35,
+            "exp": 1.3,
+            "last_hit": 1.25,
+            "minion_clear": 1.2,
+            "death": 1.15,
+            "kill": 0.65,
+            "attack_tower": 0.6,
+            "forward": 0.85,
+            "tower_hp_point": 0.85,
+        },
+        "mid": {
+            "money": 1.05,
+            "exp": 1.05,
+            "last_hit": 1.0,
+            "minion_clear": 1.0,
+            "death": 1.0,
+            "kill": 1.0,
+            "attack_tower": 1.05,
+            "forward": 1.0,
+            "tower_hp_point": 1.0,
+        },
+        "late": {
+            "money": 0.7,
+            "exp": 0.7,
+            "last_hit": 0.75,
+            "minion_clear": 0.8,
+            "death": 0.9,
+            "kill": 1.4,
+            "attack_tower": 1.5,
+            "forward": 1.15,
+            "tower_hp_point": 1.35,
+        },
+    }
+    # Frame index (time) configuration for phase splitting and smooth transition
+    # 用帧号划分前中后期，并在相邻阶段之间做线性平滑过渡
+    EARLY_GAME_END_FRAME = 2400
+    MID_GAME_END_FRAME = 7200
+    TRANSITION_WINDOW = 600
+
+    # Forward reward hp thresholds for different phases
+    # 不同对局阶段前压所需的血量阈值
+    FORWARD_HP_THRESHOLDS = {
+        "early": 0.65,
+        "mid": 0.55,
+        "late": 0.45,
+    }
+
+    # Minion clearing heuristics
+    # 清兵逻辑相关阈值
+    MINION_CLEAR_CONFIG = {
+        "detection_radius": 10.0,
+        "optimal_distance_min": 3.0,
+        "optimal_distance_max": 3.8,
+        "danger_distance": 2.0,
+        "far_distance": 8.5,
+    }
+
+    # Tower attack related configuration
+    # 推塔相关阈值
+    TOWER_ATTACK_CONFIG = {
+        "attack_range": 8.0,
+        "safe_attack_range": 6.5,
+        "min_minion_count": 2,
+        "hp_damage_scale": 45.0,
+    }
+
+    # Health / blood management configuration (health packs etc.)
+    # 血量管理相关配置（吃血包等）
+    HEALTH_MGMT_CONFIG = {
+        "critical_hp_ratio": 0.25,
+        "low_hp_ratio": 0.4,
+        "health_pack_near": 3.5,
+        "health_pack_mid": 7.0,
+        "hp_recovery_threshold": 100.0,
+    }
+
     # Time decay factor, used in reward_manager
     # 时间衰减因子，在reward_manager中使用
     TIME_SCALE_ARG = 0
